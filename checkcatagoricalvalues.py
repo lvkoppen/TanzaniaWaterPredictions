@@ -25,3 +25,25 @@ df = pd.read_csv(os.path.join(data_location, dataset))
 df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
 
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
+
+#create dataframe where rows are all the different columns
+described_df = pd.DataFrame(df.columns, columns = ['column'])
+
+#add data type of a column to the described dataframe
+described_df["data_type"] = [df[column].dtype for column in df.columns]
+
+#add unique count of variables in a column to the described dataframe
+described_df["unique_count"] = [df[column].nunique() for column in df.columns]
+
+#add nan count of variables in a column to the described df
+described_df["nan_count"] = [df[column].isna().sum() for column in df.columns]
+
+#add zero (0) count of variables in a column to the described df
+described_df["zero_count"] = [(df[column] == 0).sum(axis=0) for column in df.columns]
+
+
+
+
+
+
+print(described_df)

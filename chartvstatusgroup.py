@@ -84,5 +84,5 @@ def bin_values(data, group_column, bins, percentage):
 
 bins = [0, 1960, 1970, 1980, 1990, 2000, 2010, 2015]
 column = "construction_year"
-plotdata = bin_values(values_with_labels, column, bins, True)
+plotdata = bin_values(values_with_labels, column, bins, False)
 plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])
