@@ -42,7 +42,7 @@ described_df["nan_count"] = [df[column].isna().sum() for column in df.columns]
 described_df["zero_count"] = [(df[column] == 0).sum(axis=0) for column in df.columns]
 
 
-
+described_df.to_excel("description.xlsx")
 
 
 
