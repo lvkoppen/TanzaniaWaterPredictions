@@ -25,14 +25,6 @@ df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
 
 
-def create_grouped_df_binned(percentage, group_column, bins):
-    if percentage:
-        dataframe = values_with_labels.groupby([group_column])["status_group"].value_counts(normalize=True).mul(100).reset_index(name="percentage")
-    else:
-        dataframe = values_with_labels.groupby([group_column])["status_group"].value_counts().reset_index(name="count")
-    return (dataframe, group_column, percentage, bins)
-
-
 def create_grouped_df(percentage, group_column):
     if percentage:
         dataframe = values_with_labels.groupby([group_column])["status_group"].value_counts(normalize=True).mul(100).reset_index(name="percentage")
@@ -67,12 +59,14 @@ def plot_groupedbar(data, x, percentage):
 #plotdata = create_grouped_df(False, 'permit')
 #plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])
 
-def bin_values(data, group_column, bins, percentage):
+def bin_values(data, group_column, bins, percentage, qcut):
     binned_group_column = "binned_" + group_column
     print(binned_group_column)
     
-    values_with_labels[binned_group_column] = pd.cut(data[group_column], bins)
-    
+    if qcut:
+        values_with_labels[binned_group_column] = pd.qcut(data[group_column], q=6, duplicates='drop')
+    else:
+        values_with_labels[binned_group_column] = pd.cut(data[group_column], bins)
  
 
     if percentage:
@@ -82,7 +76,7 @@ def bin_values(data, group_column, bins, percentage):
     return (binned_grouped_df, binned_group_column, percentage)
 #values_with_labels.groupby()
 
-bins = [0, 1960, 1970, 1980, 1990, 2000, 2010, 2015]
-column = "construction_year"
-plotdata = bin_values(values_with_labels, column, bins, False)
+bins = [0, 20, 50, 200, 400, 500, 2000, 40000]
+column = "population"
+plotdata = bin_values(values_with_labels, column, bins, True, True)
 plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])
