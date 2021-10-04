@@ -48,9 +48,10 @@ def plot_groupedbar(data, x, percentage):
                         (p.get_x() + p.get_width()/2,
                         p.get_height()+1) , ha = 'center', va='center')
         plt.legend(loc='upper right')
-
+        g.set_xticklabels(g.ax.get_xticklabels(), rotation=45)
     else:
         g = sns.catplot(x=x , y='count', hue= "status_group",  kind='bar', data = data, palette= ptt, legend= False) 
+        g.set_xticklabels(g.ax.get_xticklabels(), rotation=45)
         plt.legend(loc= 'upper center')
     
     sns.despine()
@@ -64,7 +65,7 @@ def bin_values(data, group_column, bins, percentage, qcut):
     print(binned_group_column)
     
     if qcut:
-        values_with_labels[binned_group_column] = pd.qcut(data[group_column], q=6, duplicates='drop')
+        values_with_labels[binned_group_column] = pd.qcut(data[group_column], q=10)
     else:
         values_with_labels[binned_group_column] = pd.cut(data[group_column], bins)
  
@@ -76,7 +77,8 @@ def bin_values(data, group_column, bins, percentage, qcut):
     return (binned_grouped_df, binned_group_column, percentage)
 #values_with_labels.groupby()
 
-bins = [0, 20, 50, 200, 400, 500, 2000, 40000]
-column = "population"
-plotdata = bin_values(values_with_labels, column, bins, True, True)
+bins = [-1,0, 25, 150, 300, 500, 1000, 5000, 10000, 20000, 35000]
+column = "payment"
+#plotdata = bin_values(values_with_labels, column, bins, False, False)
+plotdata = create_grouped_df(True, column)
 plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])
