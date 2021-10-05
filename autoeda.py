@@ -25,3 +25,7 @@ df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
 
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
 
+removed_empty_years = values_with_labels[values_with_labels.construction_year > 1960]
+
+report = sv.analyze(removed_empty_years)
+report.show_html('nonzeroyears.html')

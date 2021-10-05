@@ -102,4 +102,4 @@ def bin_values(data, group_column, bins, percentage, qcut):
 # plotdata = create_grouped_df(True, column)
 # plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])
 
-#print(values_with_labels['recorded_by'].value_counts().head())
+print(values_with_labels['recorded_by'].value_counts().head())

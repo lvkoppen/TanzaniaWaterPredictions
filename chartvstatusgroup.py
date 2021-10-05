@@ -75,10 +75,21 @@ def bin_values(data, group_column, bins, percentage, qcut):
     else:
         binned_grouped_df = values_with_labels.groupby([binned_group_column])["status_group"].value_counts().reset_index(name="count")
     return (binned_grouped_df, binned_group_column, percentage)
+
+
+def bin_cat_values(group_column, percentage):
+    
+    
+    binned_grouped_df = values_with_labels.groupby([group_column])["status_group"].value_counts().head().reset_index(name="count")
+
+    return (binned_grouped_df, group_column, percentage)
+
+
 #values_with_labels.groupby()
 
 bins = [-1,0, 25, 150, 300, 500, 1000, 5000, 10000, 20000, 35000]
-column = "payment"
+column = "funder"
 #plotdata = bin_values(values_with_labels, column, bins, False, False)
-plotdata = create_grouped_df(True, column)
+#plotdata = create_grouped_df(True, column)
+plotdata = bin_cat_values(column, False)
 plot_groupedbar(plotdata[0], plotdata[1], plotdata[2])

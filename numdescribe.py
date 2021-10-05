@@ -21,10 +21,3 @@ df = pd.read_csv(os.path.join(data_location, dataset))
 df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
 
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
-
-
-def describe_column(column):
-    print(values_with_labels[column].describe())
-
-
-describe_column('gps_height')
