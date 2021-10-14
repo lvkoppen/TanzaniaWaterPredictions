@@ -24,4 +24,10 @@ values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id"
 
 msno.heatmap(df)
 
-plt.show()
+#plt.show()
+
+#x = values_with_labels[values_with_labels['gps_height'] < 0]
+
+#print(x.gps_height.describe())
+
+print(values_with_labels['recorded_by'].describe())

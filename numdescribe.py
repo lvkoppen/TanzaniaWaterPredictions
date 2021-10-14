@@ -21,3 +21,10 @@ df = pd.read_csv(os.path.join(data_location, dataset))
 df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
 
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
+
+values_with_labels['log_gpsheight'] = np.log(values_with_labels['gps_height'], out=np.zeros_like(values_with_labels['gps_height'].astype('d')), where=(values_with_labels['gps_height']!=0))
+
+
+sns.histplot(values_with_labels['log_gpsheight'])
+
+plt.show()
