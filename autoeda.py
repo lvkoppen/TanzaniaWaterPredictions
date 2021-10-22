@@ -12,20 +12,21 @@ from autoviz.AutoViz_Class import AutoViz_Class
 general_directory = os.path.split(os.getcwd())[0]
 
 
-data_location = os.path.join(general_directory, "data")
+data_folder = os.path.join(general_directory, "data")
+
+data_location = os.path.join(data_folder, "prepped_data")
 
 
-
-dataset =  "trainingsetvalues" +".csv"
+dataset =  "1_scenario_data" +".csv"
 datasetlabels = "trainingsetlabels.csv"
 
 
 df = pd.read_csv(os.path.join(data_location, dataset))
-df1 = pd.read_csv(os.path.join(data_location, datasetlabels))
+df1 = pd.read_csv(os.path.join(data_folder, datasetlabels))
 
 values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
 
-removed_empty_years = values_with_labels[values_with_labels.construction_year > 1960]
 
-report = sv.analyze(removed_empty_years)
-report.show_html('nonzeroyears.html')
+
+report = sv.analyze(values_with_labels)
+report.show_html('1_prepped_data.html')
