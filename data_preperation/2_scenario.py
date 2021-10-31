@@ -2,9 +2,7 @@ import pandas as pd
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import missingno as msno
+from thefuzz import fuzz, process
 
 
 working_directory = os.path.split(os.getcwd())[0]
@@ -19,7 +17,7 @@ prepped_data_folder = os.path.join(data_location, "prepped_data")
 dataset =  "trainingsetvalues" +".csv"
 
 
-prepped_file = '1_scenario_data' + ".csv"
+prepped_file = '2_scenario_data' + ".csv"
 
 prepped_data_file_location = os.path.join(prepped_data_folder, prepped_file)
 
@@ -45,8 +43,20 @@ df['latitude'] = df['latitude'].apply(lambda x: np.where(x > -0.98, np.nan, x))
 df["gps_height"]=df['gps_height'].apply(lambda x: np.where(x < 0.1, np.nan, x))
 
 
+df['funder'] = df['funder'].map(lambda x: x.casefold() if isinstance(x, str) else x)
 
 
-df.to_csv(prepped_data_file_location, index= False)
+
+filterset = set()
+
+print(df['funder'].value_counts() > 100)
+
+
+
+
+
+
+
+#df.to_csv(prepped_data_file_location, index= False)
 
 
