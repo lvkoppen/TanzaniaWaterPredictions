@@ -248,7 +248,7 @@ def main():
 
         importances_df = imp_df(list(X_train.columns.values), importances)
         sns.set_theme()
-        sns.barplot(x="feature_importance",y='feature', data=importances_df, palette= 'mako')
+        sns.barplot(x="feature_importance",y='feature', data=importances_df, palette= 'viridis')
         plt.show()
         return importances_df
 
