@@ -279,7 +279,7 @@ def main(values_with_labels):
             columns = list(X_train.columns.values)
             columns.remove(col)
             
-            preperation = preprocessor_pipeline('CatBoostEncoder', columns= columns)
+            preperation = preprocessor_pipeline('encoder', columns= columns)
             model_clone = clone(selected_model)
 
             scoring = train_score_model(preperation, model_clone, False)
