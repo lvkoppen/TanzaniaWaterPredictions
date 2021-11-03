@@ -30,8 +30,10 @@ df.drop(columns=['wpt_name', 'public_meeting',"num_private", 'recorded_by',
 
 
 #abstraction columns
-df.drop(columns=['region_code', 'date_recorded','extraction_type_group','extraction_type_class','quality_group',
-                'management','management_group','source_type', 'source_class', 'waterpoint_type_group'], inplace= True)
+df.drop(columns=['region_code', 'date_recorded','extraction_type_class','extraction_type','quality_group',
+                'scheme_management','management_group','source', 'source_class', 'waterpoint_type'], inplace= True)
+
+                
 
 
 
