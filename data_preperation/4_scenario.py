@@ -4,8 +4,15 @@ import sys
 import numpy as np
 from thefuzz import fuzz, process
 import pprint as pp
+import geopy.distance
+from tqdm import tqdm
+from pandarallel import pandarallel
 
 pp = pp.PrettyPrinter(indent=2)
+
+tqdm.pandas()
+
+pandarallel.initialize(progress_bar=True)
 working_directory = os.path.split(os.getcwd())[0]
 
 general_directory = os.path.split(working_directory)[0]
@@ -18,9 +25,13 @@ prepped_data_folder = os.path.join(data_location, "prepped_data")
 dataset =  "trainingsetvalues" +".csv"
 
 
-prepped_file = '3_scenario_data' + ".csv"
+prepped_file = '4_scenario_data' + ".csv"
+
+gps_file = '4_gps_data' + ".csv"
 
 prepped_data_file_location = os.path.join(prepped_data_folder, prepped_file)
+
+prepped_gps_file= os.path.join(prepped_data_folder, gps_file)
 
 df = pd.read_csv(os.path.join(data_location, dataset))
 
@@ -72,10 +83,26 @@ df.dropna(subset= ['construction_year'], inplace=True)
 
 df['waterpoint_age'] = df['date_recorded'].dt.year - df['construction_year']
 
+df['latlon'] = list(zip(df['latitude'], df['longitude']))
 
-print(df.shape)
+square = pd.DataFrame(
+    np.zeros((df.shape[0], df.shape[0])),
+    index=df.index, columns=df.index
+)
 
+# replacing distance.vicenty with distance.distance
+def get_distance(col):
+    end = df.loc[col.name, 'latlon']
+    return df['latlon'].progress_apply(geopy.distance.distance,
+                              args=(end,),
+                              ellipsoid='WGS-84'
+                             )
 
-df.to_csv(prepped_data_file_location, index= False)
+distances = square.parallel_apply(get_distance, axis=1).T
+
+print(distances.head())
+
+distances.to_csv(prepped_gps_file, index = False)
+#df.to_csv(prepped_data_file_location, index= False)
 
 

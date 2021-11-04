@@ -25,13 +25,11 @@ prepped_data_file_location = os.path.join(prepped_data_folder, prepped_file)
 df = pd.read_csv(os.path.join(data_location, dataset))
 
 #standard columns to drop
-df.drop(columns=['wpt_name', 'public_meeting',"num_private", 'recorded_by',
-                'permit','scheme_name','payment_type', 'quantity_group'], inplace= True)
+#df.drop(columns=['wpt_name', 'public_meeting',"num_private", 'recorded_by','permit','scheme_name','payment_type', 'quantity_group'], inplace= True)
 
 
 #abstraction columns
-df.drop(columns=['region_code', 'date_recorded','extraction_type_class','extraction_type','quality_group',
-                'scheme_management','management_group','source', 'source_class', 'waterpoint_type'], inplace= True)
+#df.drop(columns=['region_code', 'date_recorded','extraction_type_class','extraction_type','quality_group','scheme_management','management_group','source', 'source_class', 'waterpoint_type'], inplace= True)
 
                 
 

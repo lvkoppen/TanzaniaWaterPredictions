@@ -61,9 +61,8 @@ def main(values_with_labels):
     standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded']
 
         #list of columns to be dropped
-    extra = ['waterpoint_type_group', 'quality_group','management']
-    abs_list = []
-    #['source_extraction_type', 'region', 'waterpoint_type_group', 'management', 'water_quality', 'waterpoint_age']
+    extra = [ ]
+    abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management_group', 'water_quality', 'waterpoint_age']
 
 
     abstraction_dict = {"region": ['region', 'region_code'],
@@ -100,9 +99,8 @@ def main(values_with_labels):
 
     def set_abstraction_cols(used_abs_list):
         abstracts = []
-        if used_abs_list:
-            for key, value in abstraction_dict.items():
-                abstracts = abstracts + [x for x in value if x not in used_abs_list]
+        for key, value in abstraction_dict.items():
+            abstracts = abstracts + [x for x in value if x not in used_abs_list]
         return abstracts.copy()
 
     abstraction = set_abstraction_cols(abs_list)
@@ -135,7 +133,6 @@ def main(values_with_labels):
     'JamesSteinEncoder': ce.james_stein.JamesSteinEncoder,
     'MEstimateEncoder': ce.m_estimate.MEstimateEncoder,
     'TargetEncoder': ce.target_encoder.TargetEncoder,
-    'OneHotEncoder': OneHotEncoder,
     }
     #'HelmertEncoder': ce.helmert.HelmertEncoder,
     #'HashingEncoder': ce.hashing.HashingEncoder,
