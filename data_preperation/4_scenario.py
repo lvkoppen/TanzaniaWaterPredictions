@@ -128,14 +128,12 @@ def main(df):
 
 
     def get_nearby_waterpoints():
-        print(df_partial.index)
-
-        pool = Pool()
-        results = tqdm(pool.imap_unordered(partial(mp_execution, df_partial), list(df_partial.index.values), chunksize=50), total= len(df_partial.index.values))
+        pool = Pool(8)
+        results = tqdm(pool.imap_unordered(partial(mp_execution, df_partial), list(df_partial.index.values), chunksize=40), total= len(df_partial.index.values))
         for id, l in results:
-            nearby_dict[id] = l    
+            nearby_dict[int(id)] = list(l)    
         with open('nearbydict.json', 'w') as fp:
-            json.dump(nearby_dict, fp)
+            json.dump(dict(nearby_dict), fp)
 
 
     manager = Manager()
@@ -151,8 +149,6 @@ def main(df):
 
 
 if __name__ == "__main__":
-
-
     path_to_data = get_path_to_data()
 
     df = get_data(path_to_data)
