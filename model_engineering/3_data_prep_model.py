@@ -57,13 +57,12 @@ def get_data():
 
 
 def main(values_with_labels):
-    
-    standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded']
+    #'wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded'
+    standard = []
 
         #list of columns to be dropped
-    extra = ['waterpoint_type_group', 'quality_group','management']
-    abs_list = []
-    #['source_extraction_type', 'region', 'waterpoint_type_group', 'management', 'water_quality', 'waterpoint_age']
+    extra = ['payment_type', 'permit', 'recorded_by', 'scheme_management', 'district_code']
+    abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management', 'water_quality', 'waterpoint_age']
 
 
     abstraction_dict = {"region": ['region', 'region_code'],
@@ -315,7 +314,7 @@ def main(values_with_labels):
 
 
     encoder = 'BaseNEncoder'
-    pip = preprocessor_pipeline(encoder)
+    pip = preprocessor_pipeline(encoder, log_binning=True)
     x = train_score_model(pip,selected_model,True)
     pp.pprint(x)
 

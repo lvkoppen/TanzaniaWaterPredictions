@@ -72,6 +72,7 @@ df.dropna(subset= ['construction_year'], inplace=True)
 
 df['waterpoint_age'] = df['date_recorded'].dt.year - df['construction_year']
 
+df.drop(df.loc[df['waterpoint_age'] < 0].index, inplace=True)
 
 print(df.shape)
 

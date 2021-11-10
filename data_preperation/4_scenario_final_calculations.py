@@ -85,6 +85,7 @@ def prepare_data(df_fresh):
 
 
     df['waterpoint_age'] = df['date_recorded'].dt.year - df['construction_year']
+    df.drop(df.loc[df['waterpoint_age'] < 0].index, inplace=True)
 
     return df.copy()
 
@@ -125,7 +126,7 @@ def calc_wp_data(id, df_partial = None, list_wp_nearby = None,):
     try:
         row_data = df_partial.loc[int(id),:]
     except:
-        print('not in test set')
+        print('id {} not in test set'.format(id))
         return (int(id), average_age_1km, average_age_3km, average_age_10km, count_1km, count_3km, count_10km)
 
     if list_wp_nearby[id]:
@@ -135,7 +136,7 @@ def calc_wp_data(id, df_partial = None, list_wp_nearby = None,):
             try:
                 r_value = df_partial.loc[wp,:]
             except:
-                print('not in test set')
+                print('id {} not in test set'.format(wp))
                 continue
             distance = geopy.distance.distance(row_data.latlon ,r_value.latlon)
             if(distance <= 1):
@@ -146,16 +147,22 @@ def calc_wp_data(id, df_partial = None, list_wp_nearby = None,):
                 radius['10km'].append(wp)
 
         if(radius['1km']):
-            average_age_1km = df_partial.loc[radius['1km'], 'waterpoint_age']
+            subset1 = df_partial.loc[radius['1km']]
+            x1 = subset1[subset1['waterpoint_age'] >= 0]
+            average_age_1km = round(x1['waterpoint_age'].mean(skipna=True))
             count_1km = len(radius['1km'])
-            average_age_1km = df_partial['waterpoint_age']
         if(radius['3km']):
-            average_age_3km = df_partial.loc[radius['3km'], 'waterpoint_age'].mean()
+            subset2 = df_partial.loc[radius['3km']]
+            x2 = subset2[subset2['waterpoint_age'] >= 0]
+            average_age_3km = round(x2['waterpoint_age'].mean(skipna=True))
             count_3km = len(radius['3km'])
         if(radius['10km']):
+            subset3 = df_partial.loc[radius['10km']]
+            x3 = subset3[subset3['waterpoint_age'] >= 0]
+            average_age_10km = round(x3['waterpoint_age'].mean(skipna=True))
             count_10km = len(radius['10km'])
-            average_age_10km = df_partial.loc[radius['10km'], 'waterpoint_age'].mean()
 
+        return (int(id), average_age_1km, average_age_3km, average_age_10km, count_1km, count_3km, count_10km)
         
 
     return (int(id), average_age_1km, average_age_3km, average_age_10km, count_1km, count_3km, count_10km)
@@ -176,11 +183,11 @@ def main(df, df_unfiltered):
     df_partial = df
     wp_location_data = get_json_data()
 
+
     def calculate_nearby_features():
-        pool = Pool(8)
+        pool = Pool(11)
         results = tqdm(pool.imap_unordered(partial(calc_wp_data, df_partial=df_partial, list_wp_nearby= wp_location_data), 
-                                            list(wp_location_data.keys()), chunksize=20),total=len(wp_location_data.keys()))
-        
+                                            list(wp_location_data.keys()), chunksize=40),total=len(wp_location_data.keys()))
         df_results = pd.DataFrame(results, columns= ['id','average_age_1km', 'average_age_3km', 'average_age_10km', 'count_1km', 'count_3km', 'count_10km'])
         df_results.set_index('id', inplace=True)
 
@@ -197,8 +204,8 @@ def main(df, df_unfiltered):
 
     print(df_total.shape)
 
-    get_path_to_place_data()
-    df.to_csv(get_path_to_place_data(), index= False)
+
+    df_total.to_csv(get_path_to_place_data(), index= False)
 
 
 if __name__ == "__main__":

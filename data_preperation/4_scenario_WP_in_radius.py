@@ -85,6 +85,7 @@ def prepare_data(df_fresh):
 
 
     df['waterpoint_age'] = df['date_recorded'].dt.year - df['construction_year']
+    df.drop(df.loc[df['waterpoint_age'] < 0].index, inplace=True)
 
     return df.copy()
 
@@ -118,7 +119,7 @@ def mp_execution(df_partial, id):
             if ix != id:
                 r_value = df_partial.loc[ix,:]
                 distance = geopy.distance.distance(row_data.latlon ,r_value.latlon)
-                if distance < 10:
+                if distance <= 10:
                     within_range.add(ix)
         return id, within_range
 
@@ -127,7 +128,7 @@ def main(df):
     df_partial = df
 
     def get_nearby_waterpoints():
-        pool = Pool(8)
+        pool = Pool(11)
         results = tqdm(pool.imap_unordered(partial(mp_execution, df_partial), list(df_partial.index.values), chunksize=40), total= len(df_partial.index.values))
         for id, l in results:
             nearby_dict[int(id)] = list(l)    

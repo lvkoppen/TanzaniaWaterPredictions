@@ -31,7 +31,7 @@ def get_data():
 
     #declaring data file names
     training_labels = "trainingsetlabels" + ".csv"
-    prepped_file = '3_scenario_data' + ".csv"
+    prepped_file = '4_scenario_data' + ".csv"
 
     #get path to prepared training set data
     prepped_data_file_location = os.path.join(prepped_data_folder, prepped_file)
@@ -57,12 +57,19 @@ def get_data():
 
 
 def main(values_with_labels):
+    #BASIC TO DROP LISTS DO NOT EDIT
+    #standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded']
+
     
+    # extra = [ ]
+    # abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management_group', 'water_quality', 'waterpoint_age']
+
+
     standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded']
 
         #list of columns to be dropped
-    extra = [ ]
-    abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management_group', 'water_quality', 'waterpoint_age']
+    extra = ['installer', 'latitude']
+    abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management', 'water_quality', 'waterpoint_age']
 
 
     abstraction_dict = {"region": ['region', 'region_code'],
