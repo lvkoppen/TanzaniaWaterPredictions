@@ -17,16 +17,17 @@ data_folder = os.path.join(general_directory, "data")
 data_location = os.path.join(data_folder, "prepped_data")
 
 
-dataset =  "4_scenario_data" +".csv"
-#datasetlabels = "trainingsetlabels.csv"
+#dataset =  "4_scenario_data" +".csv"
+dataset = "testsetvalues.csv"
+datasetlabels = "trainingsetlabels.csv"
 
 
-df = pd.read_csv(os.path.join(data_location, dataset))
-#df1 = pd.read_csv(os.path.join(data_folder, datasetlabels))
+df = pd.read_csv(os.path.join(data_folder, dataset))
+df1 = pd.read_csv(os.path.join(data_folder, datasetlabels))
 
 #values_with_labels = pd.merge(left=df, right=df1, left_on = "id", right_on= "id")
 
 
 
-report = sv.analyze(df)
+report = sv.analyze([df, 'Tanzanian Water Points'])
 report.show_html('4_prepped_data.html')

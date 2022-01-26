@@ -1,9 +1,10 @@
+from datetime import time
 from optbinning import BinningProcess
 import pandas as pd
 import os
 import numpy as np
 import category_encoders as ce
-from sklearn import preprocessing
+from sklearn import set_config
 from sklearn.base import clone
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -12,6 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import FunctionTransformer, StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
+from sklearn import set_config
 import matplotlib.pyplot as plt
 import timeit
 import pprint
@@ -20,7 +22,7 @@ import seaborn as sns
 pp = pprint.PrettyPrinter(indent=2)
 
 
-
+#%%
 def get_data():
     #get directory where data is located as path string
     working_directory = os.path.split(os.getcwd())[0]
@@ -31,7 +33,7 @@ def get_data():
 
     #declaring data file names
     training_labels = "trainingsetlabels" + ".csv"
-    prepped_file = '3_scenario_data' + ".csv"
+    prepped_file = '4_scenario_data' + ".csv"
 
     #get path to prepared training set data
     prepped_data_file_location = os.path.join(prepped_data_folder, prepped_file)
@@ -55,13 +57,21 @@ def get_data():
     
     return values_with_labels.copy()
 
-
+#%%
 def main(values_with_labels):
-    #'wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded'
-    standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name','payment_type', 'quantity_group','scheme_management', 'date_recorded']
+    #BASIC TO DROP LISTS DO NOT EDIT
+    #standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name',
+    # 'payment_type', 'quantity_group','scheme_management', 'date_recorded']
+
+    
+    # extra = [ ]
+    # abs_list = ['source_extraction_type', 'region', 'waterpoint_type_group', 'management_group', 'water_quality', 'waterpoint_age']
+
+    #v.123 source class, public meeting and date recorded
+    standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name', 'payment_type', 'quantity_group','scheme_management', 'date_recorded']
 
         #list of columns to be dropped
-    extra = ['source_type', 'extraction_type_class']
+    extra = ['waterpoint_type', 'extraction_type']
     abs_list = []
 
 
@@ -101,7 +111,7 @@ def main(values_with_labels):
         abstracts = []
         if used_abs_list:
             for key, value in abstraction_dict.items():
-                abstracts = abstracts + [x for x in value if x not in used_abs_list]
+                abstracts = (abstracts + [x for x in value if x not in used_abs_list])
         return abstracts.copy()
 
     abstraction = set_abstraction_cols(abs_list)
@@ -134,7 +144,6 @@ def main(values_with_labels):
     'JamesSteinEncoder': ce.james_stein.JamesSteinEncoder,
     'MEstimateEncoder': ce.m_estimate.MEstimateEncoder,
     'TargetEncoder': ce.target_encoder.TargetEncoder,
-    'OneHotEncoder': OneHotEncoder,
     }
     #'HelmertEncoder': ce.helmert.HelmertEncoder,
     #'HashingEncoder': ce.hashing.HashingEncoder,
@@ -147,16 +156,16 @@ def main(values_with_labels):
     print("shape of data used for training is: {}".format(values_with_labels.shape))
     
     
-    X_train, X_test, y_train, y_test = train_test_split(values_with_labels, labels, test_size=0.3, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(values_with_labels, labels, test_size=0.3, stratify = labels, random_state=42)
 
 
     #create model
-    selected_model = RandomForestClassifier(random_state=42)
+    selected_model = RandomForestClassifier(criterion='entropy',random_state=42, n_estimators=1000, max_depth=12,class_weight='balanced', max_features='auto')
 
     
 
 
-    def preprocessor_pipeline(encoder, columns=None, log_binning = False):
+    def preprocessor_pipeline(encoder, columns=None, log_binning = True):
         scale_cols = scale_features.copy()
         log_cols = log_features.copy()
         category_cols = category_features.copy()
@@ -201,7 +210,6 @@ def main(values_with_labels):
                 ('scale', StandardScaler())
             ])
         else:
-            print("with log binning")
             log_pipeline = Pipeline([
                 ("log", FunctionTransformer(np.log1p, validate=False)),
                 ('binning', binning_process)
@@ -225,13 +233,18 @@ def main(values_with_labels):
 
         return preprocessor
 
-    def train_score_model(preprocessor, model, confusion_matrix = False):
+    def train_score_model(preprocessor, model, confusion_matrix = False, print_pipe = False):
         pipe = Pipeline(
             steps=[
                 ("preprocessor",preprocessor),
                 ('classifier', model)
             ]
         )
+
+        if(print_pipe):
+            set_config(display='diagram')
+            pipe
+
         model = pipe.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
@@ -243,7 +256,7 @@ def main(values_with_labels):
         'recall': recall_score(y_test, y_pred, average= 'weighted'),
         }
 
-
+        pp.pprint(row)
         if confusion_matrix is True:
             create_confusion_matrix(y_test=y_test, y_pred=y_pred, classes=['functional', 'needs repair', 'non functional'])
         return row
@@ -310,18 +323,32 @@ def main(values_with_labels):
         sns.set_theme()
         sns.barplot(x="feature_importance",y='feature', data=importances_df, palette= 'viridis')
         plt.show()
-        pp.pprint(result_scores)
         return importances_df
 
-
+    #%%
     encoder = 'BaseNEncoder'
-    pip = preprocessor_pipeline(encoder, log_binning=True)
-    x = train_score_model(pip,selected_model,True)
-    pp.pprint(x)
+    pip = preprocessor_pipeline(encoder, log_binning=False)
+    pipe = Pipeline(
+            steps=[
+                ("preprocessor",pip),
+                ('classifier', selected_model)
+            ]
+        )
 
-    pp.pprint(feature_importance(selected_model, encoder))
+    #x = train_score_model(pip,selected_model,True, False)
+    return pipe
 
+    #pp.pprint(feature_importance(selected_model, encoder))
 
+#%%
+
+pipe
 if __name__== "__main__":
     data = get_data()
-    main(data)
+    pipe = main(data)
+    
+#%%
+set_config(display="diagram")
+pipe
+
+# %%
