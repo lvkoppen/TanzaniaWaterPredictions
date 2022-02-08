@@ -1,4 +1,5 @@
 from datetime import time
+from itertools import count
 from optbinning import BinningProcess
 import pandas as pd
 import os
@@ -70,7 +71,7 @@ def main(values_with_labels):
     standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name', 'payment_type', 'quantity_group','scheme_management', 'date_recorded']
 
         #list of columns to be dropped
-    extra = ['waterpoint_type', 'extraction_type']
+    extra = ['waterpoint_type', 'extraction_type', 'district_code', 'region_code']
     abs_list = []
 
 
@@ -131,10 +132,13 @@ def main(values_with_labels):
     feature_skew = values_with_labels.select_dtypes(include=[np.number]).skew()
 
     log_list = feature_skew[abs(feature_skew)>0.9].index
-    log_features = list(log_list.values)
-    scale_features = [name for name in feature_skew.index if name not in log_features]
+    log_ft = list(log_list.values)
+    scale_features = [name for name in feature_skew.index if name not in log_ft]
+    count_items = ['count_1km','count_3km','count_10km']
+    log_features = [name for name in log_ft if name not in count_items]
 
-
+    for item in count_items:
+        scale_features.append(item)
     #list of to be used encoders for comparison
     encoders = {
     'BaseNEncoder': ce.basen.BaseNEncoder,

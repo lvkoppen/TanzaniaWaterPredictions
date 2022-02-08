@@ -22,7 +22,7 @@ import seaborn as sns
 pp = pprint.PrettyPrinter(indent=2)
 
 
-#%%
+
 def get_data():
     #get directory where data is located as path string
     working_directory = os.path.split(os.getcwd())[0]
@@ -57,7 +57,6 @@ def get_data():
     
     return values_with_labels.copy()
 
-#%%
 def main(values_with_labels):
     #BASIC TO DROP LISTS DO NOT EDIT
     #standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name',
@@ -71,7 +70,7 @@ def main(values_with_labels):
     standard = ['wpt_name', 'public_meeting',"num_private", 'recorded_by', 'permit','scheme_name', 'payment_type', 'quantity_group','scheme_management', 'date_recorded']
 
         #list of columns to be dropped
-    extra = ['waterpoint_type', 'extraction_type']
+    extra = ['waterpoint_type', 'extraction_type', 'district_code']
     abs_list = []
 
 
@@ -160,7 +159,7 @@ def main(values_with_labels):
 
 
     #create model
-    selected_model = RandomForestClassifier(criterion='entropy',random_state=42, n_estimators=1000, max_depth=12,class_weight='balanced', max_features='auto')
+    selected_model = RandomForestClassifier(criterion='gini', n_estimators=1000, max_depth=12,class_weight='balanced', max_features='auto')
 
     
 
@@ -325,9 +324,8 @@ def main(values_with_labels):
         plt.show()
         return importances_df
 
-    #%%
     encoder = 'BaseNEncoder'
-    pip = preprocessor_pipeline(encoder, log_binning=False)
+    pip = preprocessor_pipeline(encoder, log_binning=True)
     pipe = Pipeline(
             steps=[
                 ("preprocessor",pip),
@@ -340,15 +338,13 @@ def main(values_with_labels):
 
     #pp.pprint(feature_importance(selected_model, encoder))
 
-#%%
 
-pipe
+
 if __name__== "__main__":
     data = get_data()
     pipe = main(data)
     
-#%%
+
 set_config(display="diagram")
 pipe
 
-# %%
